@@ -1,0 +1,2 @@
+roure;arbre;120.0;4,5m
+pi;arbre;53.0;2,6m
