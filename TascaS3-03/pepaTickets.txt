@@ -1,0 +1,5 @@
+rosa;flor;3.0;vermell;1
+rosa;flor;3.5;rosa;1
+pi;arbre;45.0;3,2m;2
+amapola;flor;12.0;blanco;2
+maceta;decoracio;12.0;plastico;2

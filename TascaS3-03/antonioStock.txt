@@ -1,0 +1,4 @@
+pino;arbre;34.0;1,80m
+rosa;flor;3.0;rojo
+roble;arbre;321.0;12
+rosa;flor;3.0;rojo
