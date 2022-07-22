@@ -1,33 +1,41 @@
 package nivell1;
 
+import nivell3.DaoMongoDB;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
 
 public class Principal {
 	
     private static List<Product> stock = new ArrayList<Product>();
     private static List<Ticket> ticketList = new ArrayList<Ticket>();
+	public static DaoMongoDB daoMongoDB = new DaoMongoDB();
     static String floristName;
     
 	public static void main(String[] args) {
 
-		boolean sortirMenu=false;
-		
-		floristName=requireString("Amb quina floristeria vols treballar?");
-		
-		FileManagement.fileNotFound(floristName.toLowerCase()+"Stock.txt");
-		FileManagement.fileNotFound(floristName.toLowerCase()+"Tickets.txt");
-		
-		FileManagement.setFileName(floristName);
-		stock=FileManagement.readStock();
-		ticketList=FileManagement.readTickets();
 
+		boolean sortirMenu = false;
 		
+//		floristName=requireString("Amb quina floristeria vols treballar?");
+//
+//		FileManagement.fileNotFound(floristName.toLowerCase()+"Stock.txt");
+//		FileManagement.fileNotFound(floristName.toLowerCase()+"Tickets.txt");
+//
+//		FileManagement.setFileName(floristName);
+//		stock=FileManagement.readStock();
+//		ticketList=FileManagement.readTickets();
+		stock = daoMongoDB.getDataCollection();
+
 		do{
-			sortirMenu=showMenu(sortirMenu);
+			sortirMenu = showMenu(sortirMenu);
 			
 		}while(!sortirMenu);
+
+
+
 	}
 	
 	public static boolean showMenu(boolean sortirMenu) {
@@ -39,7 +47,7 @@ public class Principal {
 		int itemToDelate;
 		
         System.out.println("\n               __/)  \n" +
-                "            .-(__(=:       " + "FLORISTERIA "+floristName.toUpperCase()+"\n" +
+                "            .-(__(=:       " + "FLORISTERIA PEPA \n" +
                 "            |    \\)\n" +
                 "     (\\__   |              1 - AFEGIR PRODUCTE\n" +
                 "     :=)__)-|  __/)        2 - RETIRAR PRODUCTE\n" +
@@ -58,16 +66,17 @@ public class Principal {
 
             case "1":
             	
-            	name=requireString("Introdueix el nom del producte.");
-            	price=requireFloatNumber("Introdueix el preu del producte.");
-            	product=addNewProductMenu(name, price);
+            	name = requireString("Introdueix el nom del producte.");
+            	price = requireFloatNumber("Introdueix el preu del producte.");
+            	product = addNewProductMenu(name, price);
             	
-            	if (product!=null) {
-            		
+            	if (product != null) {
+            		daoMongoDB.addProduct(product);
             		stock.add(product);
+
             		
-            		FileManagement.writeStock(stock);
-            		System.out.println("S'ha afegit el producte "+ name+ " a l'stock.");
+            		//FileManagement.writeStock(stock);
+            		System.out.println("S'ha afegit el producte "+ name + " a l'stock.");
             	}
             	else {
             		
@@ -80,9 +89,11 @@ public class Principal {
             	
             	System.out.println("Quin producte vols retirà?");
                 printStock();
-            	itemToDelate=requireIntNumber("Introdueix el número del producte a retirar.")-1;
-            	removeItemFromStock(itemToDelate);
-            	System.out.println("El producta s'ha eliminat!");
+            	itemToDelate = requireIntNumber("Introdueix el número del producte a retirar.") - 1 ;
+
+				daoMongoDB.removeProduct(stock.get(itemToDelate));
+				removeItemFromStock(itemToDelate);
+            	System.out.println("El producte s'ha eliminat!");
             	
                 break;
                 
@@ -122,7 +133,7 @@ public class Principal {
             case "0":
             	
     			System.out.println("Gracies per utilitzar l'aplicació. Adeu!!");
-    			FileManagement.writeStock(stock);
+    			//FileManagement.writeStock(stock);
     			uploadTicketsDB();
     			sortirMenu=true;
                 break;
@@ -145,28 +156,28 @@ public class Principal {
 		String type;
 		Product product=null;
 		String index=requireString("\nIntrodueix el tipus de producte que vols afegir.\n "
-				+ " 1-Arbre.\\n 2-Flor.\\n 3-Decoració.\\n 0-Sortir opció afegir producte.");
+				+ " 1-Arbre. \n 2-Flor.\n 3-Decoració.\n 0-Sortir opció afegir producte.");
 		
 		switch (index) {
 		
 		case "1":
 			
 			type="arbre";
-			product=new Tree(name, type, price, requireString("Introdueix l'alçada de l'arbre."));
+			product=new Tree(null, name, type, price, requireString("Introdueix l'alçada de l'arbre."));
 			
 			break;
 			
 		case "2":
 			
-			type="flor";
-			product=new Flower(name, type, price, requireString("Introdueix el color de la flor."));
+			type = "flor";
+			product = new Flower(null, name, type, price, requireString("Introdueix el color de la flor."));
 			
 			break;
 			
 		case "3":
 			
-			type="decoracio";
-			product=new Decor(name, type, price, requireString("Introdueix el material."));
+			type = "decoracio";
+			product = new Decor(null,name, type, price, requireString("Introdueix el material."));
 			
 			break;
 			
@@ -187,10 +198,10 @@ public class Principal {
 		
     	int i=0;
     	
-    	for(Product product:stock){
+    	for(Product product : stock){
     		
     		i++;
-    		System.out.println(i+"- "+product);
+    		System.out.println(i + "- " + product);
     	}
 	}
 	
@@ -203,7 +214,7 @@ public class Principal {
                 .filter(p->p.getType().equalsIgnoreCase("flor")).count();
 		
 		int decorStock =(int) stock.stream()
-                .filter(p->p.getType().equalsIgnoreCase("decoracio")).count();
+                .filter(p->p.getType().equalsIgnoreCase("decoració")).count();
 		
 		System.out.println("Stock d'arbres: "+treeStock+" unitats.");
 		System.out.println("Stock de flors: "+flowerStock+" unitats.");
@@ -211,9 +222,10 @@ public class Principal {
 	}
 	
 	public static void removeItemFromStock(int itemToDelate) {
-		
+
+		System.out.println(stock.get(itemToDelate).get_id());
     	stock.remove(itemToDelate);
-		FileManagement.writeStock(stock);
+		//FileManagement.writeStock(stock);
 	}
 	
 	public static void showBuys() {
@@ -249,7 +261,7 @@ public class Principal {
                         System.out.println("Sortint. No se ha fet cap compra...");
                     }
 
-                } else if (0<valueSelected&&valueSelected<=stock.size()) {
+                } else if ( 0 < valueSelected && valueSelected <= stock.size()) {
 
                     ticket.addProduct(stock.get(valueSelected - 1));
                     removeItemFromStock(valueSelected - 1);
@@ -285,33 +297,33 @@ public class Principal {
 
 		public static String requireString(String message) {
 			
-			Scanner sc=new Scanner(System.in);
+			Scanner sc = new Scanner(System.in);
 			String string;
 			
 			System.out.println(message);
-			string=sc.nextLine();
+			string = sc.nextLine();
 			
 			return string;
 		}
 		
 		public static int requireIntNumber(String message) {
 			
-			Scanner sc=new Scanner(System.in);
+			Scanner sc = new Scanner(System.in);
 			int num;
 			
 			System.out.println(message);
-			num=sc.nextInt();
+			num = sc.nextInt();
 			
 			return num;
 		}
 		
 		public static float requireFloatNumber(String message) {
 			
-			Scanner sc=new Scanner(System.in);
+			Scanner sc = new Scanner(System.in);
 			float num;
 			
 			System.out.println(message);
-			num=sc.nextFloat();
+			num = sc.nextFloat();
 			
 			return num;
 		}

@@ -1,6 +1,4 @@
-roure;arbre;120.0;4,5m
 pi;arbre;53.0;2,6m
-rosa;flor;3.0;vermell
 rosa;flor;3.5;rosa
 pi;arbre;45.0;3,2m
 amapola;flor;12.0;blanco
@@ -19,3 +17,7 @@ pi;arbre;45.0;3,2m
 amapola;flor;12.0;blanco
 maceta;decoracio;12.0;plastico
 amapola;flor;22.0;rojo
+arbre kiku;arbre;23.0;3
+Tiesto;decoracio;234.0;jusio
+Dildo;decoracio;69.69;Latex
+Compresas;decoracio;3.0;latex

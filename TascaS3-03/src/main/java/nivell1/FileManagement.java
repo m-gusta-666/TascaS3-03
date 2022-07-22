@@ -57,15 +57,15 @@ public class FileManagement {
 
                 if(dummy[1].equals("flor")){
                 	
-                    stock.add(new Flower(dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
+                    stock.add(new Flower(null,dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
                 }
                 else if (dummy[1].equals("arbre")) {
                 	
-                    stock.add(new Tree(dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
+                    stock.add(new Tree(null,dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
                 }
                 else {
                 	
-                    stock.add(new Decor(dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
+                    stock.add(new Decor(null,dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
                 }
 
                 line=br.readLine();
@@ -110,15 +110,15 @@ public class FileManagement {
                  productes del Ticket corresponent*/
                 if (dummy[1].equals("flor")) {
 
-                	currentTicket.addProduct(new Flower(dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
+                	currentTicket.addProduct(new Flower(null,dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
                 }
             	else if (dummy[1].equals("arbre")) {
                 	
-                	currentTicket.addProduct(new Tree(dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));	
+                	currentTicket.addProduct(new Tree(null,dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
                 }
             	else {
             		
-                	currentTicket.addProduct(new Decor(dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
+                	currentTicket.addProduct(new Decor(null,dummy[0], dummy[1], Float.parseFloat(dummy[2]), dummy[3]));
                 }
 
                 line=br.readLine();
@@ -144,7 +144,7 @@ public class FileManagement {
 
             for (int i=0; i<stock.size(); i++) {
             	
-                br.write(stock.get(i).toStringFormat() + "\r\n");
+               // br.write(stock.get(i).toStringFormat() + "\r\n");
             }
 
             br.close();
@@ -167,7 +167,7 @@ public class FileManagement {
                 
                 for (int j=0; j<productes.size(); j++) {
                 	
-                    br.write(productes.get(j).toStringFormat() + ";" + tickets.get(i).getId() + "\r\n");
+                 //   br.write(productes.get(j).toStringFormat() + ";" + tickets.get(i).getId() + "\r\n");
                 }
             }
 

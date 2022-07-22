@@ -1,14 +1,16 @@
 package nivell1;
 
+import org.bson.types.ObjectId;
+
 public class Flower extends Product {
 
 	//private static int stock;
 	private String color;
 	//private int id;
 	
-	public Flower(String name, String type, float price, String color) {
-		
-		super(name, type, price);
+	public Flower(ObjectId id, String name, String type, float price, String color) {
+		super(id, name, type, price);
+
 		this.color=color;
 		//id=Product.getId();
 	}
@@ -21,13 +23,9 @@ public class Flower extends Product {
 		this.color = color;
 	}
 
-	@Override
-	public String toStringFormat() {
-		return name+";"+type+";"+price+";"+color;
-	}
 
 	@Override
 	public String toString() {
-		return "[nom=" + name + ", tipus=" + type + ", color=" + color + ", preu=" + price + "]";
+		return "[cod= "+ this._id + ",nom=" + this.name + ", tipus=" + type + ", color=" + color + ", preu=" + price + "]";
 	}
 }
