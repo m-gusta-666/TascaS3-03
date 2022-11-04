@@ -16,6 +16,7 @@ import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DaoMongoDB implements AutoCloseable {
 
@@ -70,7 +71,7 @@ public class DaoMongoDB implements AutoCloseable {
             doc.put("productList", productList);
             doc.put("Total_Amount", ticket.getTicketAmount());
             InsertOneResult result = collection.insertOne(doc);
-            ObjectId valueId = result.getInsertedId().asObjectId().getValue();
+            ObjectId valueId = Objects.requireNonNull(result.getInsertedId()).asObjectId().getValue();
             ticket.setId(valueId);
             System.out.println("Inserted ticket to document with the following id: "
                     + valueId);
@@ -106,7 +107,7 @@ public class DaoMongoDB implements AutoCloseable {
         }
 
         InsertOneResult result = collection.insertOne(doc1);
-        ObjectId valueId = result.getInsertedId().asObjectId().getValue();
+        ObjectId valueId = Objects.requireNonNull(result.getInsertedId()).asObjectId().getValue();
         product.set_id(valueId);
         System.out.println("Inserted product to document with the following id: "
                 + valueId);
@@ -149,14 +150,7 @@ public class DaoMongoDB implements AutoCloseable {
                     String tipo = docProduct.getString("type");
                     Product product = null;
 
-                    if (tipo.equals("flor")) {
-                        product = gson.fromJson(docProduct.toJson(), Flower.class);
-                    } else if (tipo.equals("arbre")) {
-                        product = gson.fromJson(docProduct.toJson(), Tree.class);
-                    } else if (tipo.equals("decoració")) {
-                        product = gson.fromJson(docProduct.toJson(), Decor.class);
-                    }
-                    product.set_id(productObjectId);
+                    product = getProduct(gson, docProduct, productObjectId, tipo, product);
                     //System.out.println(productObjectId.toString());
                     ticket.addProduct(product);
                 }
@@ -170,6 +164,22 @@ public class DaoMongoDB implements AutoCloseable {
         }
 
         return tickets;
+    }
+
+    private Product getProduct(Gson gson, Document docProduct, ObjectId productObjectId, String tipo, Product product) {
+        switch (tipo) {
+            case "flor":
+                product = gson.fromJson(docProduct.toJson(), Flower.class);
+                break;
+            case "arbre":
+                product = gson.fromJson(docProduct.toJson(), Tree.class);
+                break;
+            case "decoració":
+                product = gson.fromJson(docProduct.toJson(), Decor.class);
+                break;
+        }
+        product.set_id(productObjectId);
+        return product;
     }
 
 
@@ -197,14 +207,7 @@ public class DaoMongoDB implements AutoCloseable {
                 String tipo = document.getString("type");
 
                 //System.out.println(document.toJson());
-                if (tipo.equals("flor")) {
-                    product = gson.fromJson(document.toJson(), Flower.class);
-                } else if (tipo.equals("arbre")) {
-                    product = gson.fromJson(document.toJson(), Tree.class);
-                } else if (tipo.equals("decoració")) {
-                    product = gson.fromJson(document.toJson(), Decor.class);
-                }
-                product.set_id(id);
+                product = getProduct(gson, document, id, tipo, product);
                 products.add(product);
             }
         } finally {
@@ -215,7 +218,7 @@ public class DaoMongoDB implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close(){
         if (mongoClient != null) mongoClient.close();
     }
 }
