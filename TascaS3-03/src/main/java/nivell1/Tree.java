@@ -8,7 +8,7 @@ public class Tree extends Product {
 	
 	public Tree(ObjectId id,String name, String type, float price, String height) {
 		super(id, name, type, price);
-		this.height=height;
+		this.height = height;
 	}
 
 	public String getHeight() {
@@ -17,6 +17,10 @@ public class Tree extends Product {
 
 	public void setHeight(String height) {
 		this.height = height;
+	}
+
+	public String getCharacteristic(){
+		return String.format("%-10s %-15s","Alçada: ", this.height);
 	}
 
 	@Override

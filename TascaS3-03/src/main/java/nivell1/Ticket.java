@@ -1,26 +1,27 @@
 package nivell1;
+import org.bson.types.ObjectId;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Ticket {
 
 	private ArrayList<Product> salesList;
-	private int id;
+	private ObjectId id;
 	
-	public Ticket(int id) {
-		salesList=new ArrayList<Product>();
-		this.id=id;
+	public Ticket() {
+		salesList = new ArrayList<Product>();
 	}
 	
 	public void addProduct(Product product) {
 		salesList.add(product);
 	}
 	
-	public int getId() {
+	public ObjectId getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(ObjectId id) {
 		this.id=id;
 	}
 
@@ -28,14 +29,14 @@ public class Ticket {
 		return salesList;
 	}
 	
-	public float getTicketPrice() {
+	public float getTicketAmount() {
 		
 		return totalTicketPrice(salesList);
 	}
 
 	public void showProducts() {
 		salesList.forEach(System.out::println);
-		System.out.println("Preu final "+totalTicketPrice(salesList)+" euros.");
+		System.out.println("Preu final " + totalTicketPrice(salesList) + " euros.");
 	}
 	
     public static float totalTicketPrice(List<Product> list){
@@ -44,6 +45,6 @@ public class Ticket {
     }
 	
 	public String toString() {
-		return "Venda "+id+ ".\n";
+		return "Venda " + id + ".\n";
 	}
 }

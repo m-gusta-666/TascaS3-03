@@ -4,12 +4,12 @@ import org.bson.types.ObjectId;
 
 public class Decor extends Product {
 
-	String material;
+	private String material;
 	
 	public Decor(ObjectId id, String name, String type, float price, String material) {
 		
 		super(id,name, type, price);
-		this.material=material;
+		this.material = material;
 	}
 	
 	public String getMaterial() {
@@ -21,6 +21,9 @@ public class Decor extends Product {
 		this.material = material;
 	}
 
+	public String getCharacteristic(){
+		return String.format("%-10s %-15s","Material: ", this.material);
+	}
 	
 	@Override
 	public String toString() {

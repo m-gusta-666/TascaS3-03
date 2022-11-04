@@ -1,14 +1,12 @@
 package nivell3;
 
 import com.google.gson.Gson;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.mongodb.client.*;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.result.InsertOneResult;
-import nivell1.Decor;
-import nivell1.Flower;
-import nivell1.Product;
-import nivell1.Tree;
+import nivell1.*;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
 import org.bson.Document;
@@ -17,6 +15,7 @@ import com.mongodb.MongoException;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DaoMongoDB implements AutoCloseable {
 
@@ -42,33 +41,74 @@ public class DaoMongoDB implements AutoCloseable {
 
     }
 
+    public void addTicket(Ticket ticket) {
+
+        if (database.getCollection("tickets") == null) {
+
+            database.createCollection("tickets");
+        } else {
+
+            MongoCollection<Document> collection = database.getCollection("tickets");
+            List<DBObject> productList = new ArrayList<DBObject>();
+            Document doc = new Document();
+
+
+            for (Product product : ticket.getSales()) {
+                BasicDBObject doc2 =
+                        new BasicDBObject("name", product.getName())
+                                .append("type", product.getType())
+                                .append("price", product.getPrice())
+                                .append("_id",product.get_id());
+                if (product instanceof Tree)
+                    doc2.append("height", ((Tree) product).getHeight());
+                else if (product instanceof Flower)
+                    doc2.append("color", ((Flower) product).getColor());
+                else if (product instanceof Decor)
+                    doc2.append("material", ((Decor) product).getMaterial());
+                productList.add(doc2);
+            }
+            doc.put("productList", productList);
+            doc.put("Total_Amount", ticket.getTicketAmount());
+            InsertOneResult result = collection.insertOne(doc);
+            ObjectId valueId = result.getInsertedId().asObjectId().getValue();
+            ticket.setId(valueId);
+            System.out.println("Inserted ticket to document with the following id: "
+                    + valueId);
+
+        }
+    }
+
     public void addProduct(Product product) {
 
         MongoCollection<Document> collection = database.getCollection("products");
         Document doc1 = null;
+
         if (product instanceof Tree) {
             Tree tree = (Tree) product;
             doc1 = new Document("name", tree.getName())
-                    .append("type", tree.getType()).append("price", tree.getPrice())
+                    .append("type", tree.getType())
+                    .append("price", tree.getPrice())
                     .append("height", tree.getHeight());
 
         } else if (product instanceof Flower) {
             Flower flower = (Flower) product;
             doc1 = new Document("name", flower.getName())
-                    .append("type", flower.getType()).append("price", flower.getPrice())
+                    .append("type", flower.getType())
+                    .append("price", flower.getPrice())
                     .append("color", flower.getColor());
 
         } else if (product instanceof Decor) {
             Decor decor = (Decor) product;
             doc1 = new Document("name", decor.getName())
-                    .append("type", decor.getType()).append("price", decor.getPrice())
+                    .append("type", decor.getType())
+                    .append("price", decor.getPrice())
                     .append("material", decor.getMaterial());
         }
 
         InsertOneResult result = collection.insertOne(doc1);
         ObjectId valueId = result.getInsertedId().asObjectId().getValue();
         product.set_id(valueId);
-        System.out.println("Inserted a document with the following id: "
+        System.out.println("Inserted product to document with the following id: "
                 + valueId);
 
     }
@@ -77,16 +117,67 @@ public class DaoMongoDB implements AutoCloseable {
     public void removeProduct(Product product) {
 
         MongoCollection<Document> collection = database.getCollection("products");
-        System.out.println("OJU:"   + product.get_id());
+        System.out.println("OJU:" + product.get_id());
         collection.deleteOne(
                 new Document("_id", new ObjectId(product.get_id().toString()))
         );
-
     }
 
+    public ArrayList<Ticket> getDataCollectionTickets() {
+
+        MongoCollection<Document> collection = database.getCollection("tickets");
+
+        MongoCursor<Document> cursor = collection.find()
+                .sort(Sorts.descending("_id"))
+                .iterator();
+        Gson gson = new Gson();
+        ArrayList<Ticket> tickets = new ArrayList<>();
+
+        try {
+
+            while (cursor.hasNext()) {
+                Ticket ticket = new Ticket();
+                Document document = cursor.next();
+                ObjectId id = document.getObjectId("_id");
+                ticket.setId(id);
+
+                List<Document> productList = document.getList("productList", Document.class);
+
+                for (Document docProduct : productList) {
+
+                    ObjectId productObjectId = docProduct.getObjectId("_id");
+                    String tipo = docProduct.getString("type");
+                    Product product = null;
+
+                    if (tipo.equals("flor")) {
+                        product = gson.fromJson(docProduct.toJson(), Flower.class);
+                    } else if (tipo.equals("arbre")) {
+                        product = gson.fromJson(docProduct.toJson(), Tree.class);
+                    } else if (tipo.equals("decoració")) {
+                        product = gson.fromJson(docProduct.toJson(), Decor.class);
+                    }
+                    product.set_id(productObjectId);
+                    //System.out.println(productObjectId.toString());
+                    ticket.addProduct(product);
+                }
+                tickets.add(ticket);
+
+            }
+
+        } finally {
+
+            cursor.close();
+        }
+
+        return tickets;
+    }
+
+
+    // Get data products from mongoDB
     public ArrayList<Product> getDataCollection() {
 
         MongoCollection<Document> collection = database.getCollection("products");
+        //List<DBObject> productList = new ArrayList<DBObject>();
         ArrayList<Product> products = new ArrayList<>();
         Gson gson = new Gson();
 //        Bson projectionFields = Projections.fields(
@@ -94,8 +185,9 @@ public class DaoMongoDB implements AutoCloseable {
 //                Projections.excludeId());
 
         MongoCursor<Document> cursor = collection.find()
-                //.projection(projectionFields)
-                .sort(Sorts.descending("title")).iterator();
+                .sort(Sorts.descending("title"))
+                .iterator();
+        //.projection(projectionFields)
         try {
             while (cursor.hasNext()) {
                 //System.out.println(cursor.next().toJson());
@@ -104,12 +196,12 @@ public class DaoMongoDB implements AutoCloseable {
                 Product product = null;
                 String tipo = document.getString("type");
 
-               //System.out.println(document.toJson());
+                //System.out.println(document.toJson());
                 if (tipo.equals("flor")) {
                     product = gson.fromJson(document.toJson(), Flower.class);
                 } else if (tipo.equals("arbre")) {
                     product = gson.fromJson(document.toJson(), Tree.class);
-                } else if (tipo.equals("decoracio")) {
+                } else if (tipo.equals("decoració")) {
                     product = gson.fromJson(document.toJson(), Decor.class);
                 }
                 product.set_id(id);

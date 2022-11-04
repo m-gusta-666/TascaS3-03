@@ -19,11 +19,7 @@ public class FileManagement {
 	private static String fileStock;
 	private static String fileTickets;
 
-    public static void setFileName(String name) {
-    	
-    	fileStock=name.toLowerCase()+"Stock.txt";
-        fileTickets=name.toLowerCase()+"Tickets.txt";
-    }
+
     
     public static void fileNotFound(String fileName) {
     	
@@ -99,9 +95,9 @@ public class FileManagement {
                 String[] dummy=line.split(";");
                 int ticketId=Integer.parseInt(dummy[4]);
                 
-                if (ticketId==tickets.size()+1) {
+                if (ticketId == tickets.size()+1) {
                 	
-                    tickets.add(new Ticket(ticketId));
+                    tickets.add(new Ticket());
                 }
 
                 Ticket currentTicket=tickets.get(ticketId - 1);
