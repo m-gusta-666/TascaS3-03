@@ -1,7 +1,7 @@
 # Tasca_S3_03_N3  
 ## Tasca S3.03: Developers Team
 
-<img src="https://www.pngkit.com/png/full/225-2254691_9kib-354x415-unnamed-mongodb-logo-svg.png" height="415" width="354" >
+<img src="https://www.pngkit.com/png/full/225-2254691_9kib-354x415-unnamed-mongodb-logo-svg.png" height="185" width="160" >
 
 ## Exercici
 Hem de crear un programa per a gestionar el catàleg de productes d'una floristeria. En el nivell 1, gestiona la persistència en una base de dades MongoDB.
