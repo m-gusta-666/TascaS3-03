@@ -1,7 +1,7 @@
 # Tasca_S3_03_N3  
 ## Tasca S3.03: Developers Team
 
-<img src="https://magazine.odroid.com/wp-content/uploads/mongo-db-logo.png" height="263" width="300" >
+<img src="[https://magazine.odroid.com/wp-content/uploads/mongo-db-logo.png](https://www.pngkit.com/png/detail/225-2254691_9kib-354x415-unnamed-mongodb-logo-svg.png)" height="263" width="300" >
 ## Exercici
 Hem de crear un programa per a gestionar el catàleg de productes d'una floristeria. En el nivell 1, gestiona la persistència en una base de dades MongoDB.
 
